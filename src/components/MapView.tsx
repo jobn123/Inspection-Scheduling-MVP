@@ -482,13 +482,18 @@ export default function MapView() {
     }
   }, [robot, trail]);
 
-  // 侧栏点击 -> 飞行定位
+  // 侧栏点击 -> 飞行定位（精确飞到要素坐标，并将其居中显示）
   useEffect(() => {
     const viewer = viewerRef.current;
     if (!viewer || !flyTo) return;
-    viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(flyTo[0], flyTo[1] - 0.0022, 420),
-      orientation: { heading: Cesium.Math.toRadians(20), pitch: Cesium.Math.toRadians(-24), roll: 0 },
+    const target = Cesium.Cartesian3.fromDegrees(flyTo[0], flyTo[1]);
+    const sphere = new Cesium.BoundingSphere(target, 1);
+    viewer.camera.flyToBoundingSphere(sphere, {
+      offset: new Cesium.HeadingPitchRange(
+        Cesium.Math.toRadians(20),
+        Cesium.Math.toRadians(-30),
+        600
+      ),
     });
     setFlyTo(null);
   }, [flyTo, setFlyTo]);
