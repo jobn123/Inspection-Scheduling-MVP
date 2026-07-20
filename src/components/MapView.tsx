@@ -249,6 +249,14 @@ function addSampleScene(v: Cesium.Viewer): string[] {
       const [lon, lat] = localToLonLat(s.x, s.y);
       useStore.getState().addPoint(s.kind, lon, lat);
     });
+
+    // 预置一个默认禁区（园区中央空地，位于围墙 ±150×±120 内，避开楼宇与已播种点位）
+    const noGoSeed: [number, number][] = [
+      localToLonLat(-35, -10), localToLonLat(15, -10),
+      localToLonLat(15, 25), localToLonLat(-35, 25),
+    ];
+    useStore.getState().addZone(noGoSeed);
+
     sampleSeeded = true;
   }
 
