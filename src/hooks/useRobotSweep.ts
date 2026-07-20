@@ -10,10 +10,11 @@ export function useRobotSweep() {
 
   useEffect(() => {
     if (!sweepOn) return;
+    // 轨迹限定在示例园区围墙内（围墙约 ±150m(X) × ±120m(Y)），留 25~20m 余量
     const id = setInterval(() => {
       tRef.current += 0.03;
-      const xm = 300 * Math.sin(0.7 * tRef.current);
-      const ym = 220 * Math.sin(1.3 * tRef.current + Math.PI / 4);
+      const xm = 125 * Math.sin(0.7 * tRef.current);
+      const ym = 100 * Math.sin(1.3 * tRef.current + Math.PI / 4);
       pushRobot(localToLonLat(xm, ym));
     }, 60);
     return () => clearInterval(id);
