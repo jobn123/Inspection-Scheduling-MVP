@@ -16,6 +16,7 @@ export default function Toolbar() {
   const setView = useStore((s) => s.setView);
   const baseMap = useStore((s) => s.baseMap);
   const setBaseMap = useStore((s) => s.setBaseMap);
+  const setFinishNoGo = useStore((s) => s.setFinishNoGo);
 
   return (
     <div id="toolbar">
@@ -51,6 +52,11 @@ export default function Toolbar() {
       <button className="tool" onClick={() => setView('schedule')}>
         任务计划表
       </button>
+      {mode === 'noGo' && (
+        <button className="tool accent" onClick={() => setFinishNoGo(true)} title="把已画的禁区提交到地图">
+          完成禁区
+        </button>
+      )}
     </div>
   );
 }

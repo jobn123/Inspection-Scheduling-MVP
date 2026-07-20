@@ -280,7 +280,24 @@ export default function MapView() {
   const setFlyTo = useStore((s) => s.setFlyTo);
   const scenes = useStore((s) => s.scenes);
   const baseMap = useStore((s) => s.baseMap);
+  const finishNoGo = useStore((s) => s.finishNoGo);
+  const setFinishNoGo = useStore((s) => s.setFinishNoGo);
   const baseLayersRef = useRef<Cesium.ImageryLayer[]>([]);
+
+  // 提交禁区：把当前顶点落成一个多边形（≥3 点才有效），并退出 noGo 模式
+  const commitNoGo = () => {
+    const viewer = viewerRef.current;
+    if (verticesRef.current.length >= 3) {
+      const coords = verticesRef.current.map((c) => {
+        const cc = Cesium.Cartographic.fromCartesian(c);
+        return [Cesium.Math.toDegrees(cc.longitude), Cesium.Math.toDegrees(cc.latitude)] as [number, number];
+      });
+      useStore.getState().addZone(coords);
+    }
+    verticesRef.current = [];
+    if (viewer) updatePreview(viewer, []);
+    useStore.getState().setMode('select');
+  };
 
   // 挂载：原生创建 Cesium Viewer + 交互
   useEffect(() => {
@@ -343,15 +360,7 @@ export default function MapView() {
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
     handler.setInputAction(() => {
-      if (useStore.getState().mode === 'noGo' && verticesRef.current.length >= 3) {
-        const coords = verticesRef.current.map((c) => {
-          const cc = Cesium.Cartographic.fromCartesian(c);
-          return [Cesium.Math.toDegrees(cc.longitude), Cesium.Math.toDegrees(cc.latitude)] as [number, number];
-        });
-        useStore.getState().addZone(coords);
-      }
-      verticesRef.current = [];
-      updatePreview(viewer, []);
+      if (useStore.getState().mode === 'noGo') commitNoGo();
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
     // ESC 取消禁区绘制：清空未完成顶点 + 预览画笔
@@ -492,14 +501,23 @@ export default function MapView() {
     setLocateSample(false);
   }, [locateSample, setLocateSample]);
 
-  // 切换离开禁区模式时，清空未完成的绘制
+  // 点击别的按钮切走禁区模式时：若有 ≥3 个未提交顶点，自动落成一个禁区
+  //（避免"画好之后点别的按钮，图就消失"）；不足 3 点则视为取消，清空预览
   useEffect(() => {
     const viewer = viewerRef.current;
     if (mode !== 'noGo' && viewer) {
-      verticesRef.current = [];
-      updatePreview(viewer, []);
+      if (verticesRef.current.length >= 3) commitNoGo();
+      else { verticesRef.current = []; updatePreview(viewer, []); }
     }
   }, [mode]);
+
+  // 「完成禁区」按钮：消费 finishNoGo 标志，提交当前禁区
+  useEffect(() => {
+    if (finishNoGo) {
+      commitNoGo();
+      setFinishNoGo(false);
+    }
+  }, [finishNoGo, setFinishNoGo]);
 
   // 同步场景（示例 / 3D Tiles / glTF 模型），按 scenes 增删做 diff
   const sceneObjsRef = useRef<Record<string, { kind: 'entity' | 'tileset'; ids?: string[] }>>({});

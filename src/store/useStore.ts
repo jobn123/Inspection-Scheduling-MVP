@@ -45,6 +45,7 @@ interface StoreState {
   trail: [number, number][];
   flyTo: [number, number] | null;
   locateSample: boolean;
+  finishNoGo: boolean;
   scenes: SceneItem[];
   view: ViewMode;
   baseMap: BaseMap;
@@ -61,6 +62,7 @@ interface StoreState {
   pushRobot: (pos: [number, number]) => void;
   setFlyTo: (pos: [number, number] | null) => void;
   setLocateSample: (b: boolean) => void;
+  setFinishNoGo: (b: boolean) => void;
   addScene: (s: Omit<SceneItem, 'id'>) => void;
   removeScene: (id: string) => void;
   setView: (v: ViewMode) => void;
@@ -81,6 +83,7 @@ export const useStore = create<StoreState>((set) => ({
   trail: [],
   flyTo: null,
   locateSample: false,
+  finishNoGo: false,
   scenes: [],
   view: 'map',
   baseMap: 'amapSat',
@@ -113,6 +116,8 @@ export const useStore = create<StoreState>((set) => ({
   setFlyTo: (pos) => set({ flyTo: pos }),
 
   setLocateSample: (b) => set({ locateSample: b }),
+
+  setFinishNoGo: (b) => set({ finishNoGo: b }),
 
   addScene: (s) => set((st) => ({ scenes: [...st.scenes, { ...s, id: 'sc' + seq++ }] })),
 
