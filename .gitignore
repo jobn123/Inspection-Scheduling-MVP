@@ -9,6 +9,7 @@ dist-ssr/
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+vite.config.js.timestamp-*.mjs
 
 # local env / secrets
 .env

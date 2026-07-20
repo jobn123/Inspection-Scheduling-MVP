@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host --port 5173",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --base /Inspection-Scheduling-MVP/ && node scripts/fix-cesium-base.mjs",
     "preview": "vite preview --host --port 4173"
   },
   "dependencies": {
