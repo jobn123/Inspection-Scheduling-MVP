@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+dist-ssr/
+
+# vite / tsc generated artifacts
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# local env / secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# local tooling state
+.workbuddy/

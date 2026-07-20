@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>巡检调度系统 · MVP Demo (Cesium)</title>
+  <link href="https://cdn.jsdelivr.net/npm/cesium@1.119/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <script>window.CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.119/Build/Cesium/';</script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+
+  <div id="toolbar">
+    <div class="tb-title">巡检调度 MVP</div>
+    <button class="tool" data-mode="inspection">+ 巡检点</button>
+    <button class="tool" data-mode="charging">+ 充电点</button>
+    <button class="tool" data-mode="noGo">▱ 禁区</button>
+    <button class="tool active" data-mode="select">⌖ 选择/定位</button>
+    <button class="tool accent" id="sweepBtn">▶ 实时扫图</button>
+    <button class="tool danger" id="clearBtn">清除全部</button>
+  </div>
+
+  <div id="panel">
+    <div class="stat" id="stats">巡检点 0 · 充电点 0 · 禁区 0</div>
+
+    <div class="section">
+      <div class="section-title">要素列表（点击飞行定位）</div>
+      <div id="entityList" class="list"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">任务计划表（示例）</div>
+      <table id="taskTable">
+        <thead><tr><th>任务</th><th>类型</th><th>计划时间</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="hint" id="hint">提示：选择上方工具后，在地球上点击操作。禁区：左键加点，右键完成。</div>
+  </div>
+
+  <div id="conn"><span class="dot"></span><span id="connText">实时未连接</span></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/cesium@1.119/Build/Cesium/Cesium.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

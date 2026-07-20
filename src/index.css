@@ -1,0 +1,176 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { width: 100%; height: 100%; }
+body {
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: #0b1622;
+  color: #e6edf3;
+  overflow: hidden;
+}
+
+/* 隐藏 Cesium 默认版权，保持整洁 */
+.cesium-widget-credits, .cesium-credit-lightbox-overlay { display: none !important; }
+
+/* 顶部工具栏 */
+#toolbar {
+  position: absolute; top: 12px; left: 12px; z-index: 10;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  background: rgba(12, 28, 44, 0.85);
+  border: 1px solid rgba(133, 183, 235, 0.25);
+  border-radius: 12px; padding: 10px 12px;
+  backdrop-filter: blur(6px);
+}
+.tb-title { font-size: 14px; font-weight: 600; color: #b5d4f4; margin-right: 4px; }
+.tb-sep { width: 1px; height: 22px; background: rgba(133, 183, 235, 0.25); margin: 0 4px; }
+.tb-sub { font-size: 12px; color: #88a0b5; }
+.tool {
+  font-size: 13px; color: #e6edf3; cursor: pointer;
+  background: #14324f; border: 1px solid rgba(133, 183, 235, 0.3);
+  border-radius: 8px; padding: 7px 12px; transition: .15s;
+}
+.tool:hover { background: #1c4a73; }
+.tool.active { background: #2f7fd1; border-color: #6fb0f0; }
+.tool.accent { background: #1f7a4d; border-color: #4fd99a; }
+.tool.accent:hover { background: #25935e; }
+.tool.danger { background: #6e2020; border-color: #d97474; }
+
+/* 右侧面板（下移，避开顶部工具栏/标签） */
+#panel {
+  position: absolute; top: 72px; right: 12px; z-index: 10;
+  width: 320px; max-height: calc(100% - 84px); overflow: auto;
+  background: rgba(12, 28, 44, 0.88);
+  border: 1px solid rgba(133, 183, 235, 0.25);
+  border-radius: 12px; padding: 14px;
+}
+.stat { font-size: 13px; color: #9fe1cb; margin-bottom: 12px; }
+.section { margin-bottom: 14px; }
+.section-title { font-size: 13px; font-weight: 600; color: #b5d4f4; margin-bottom: 8px; }
+.list { display: flex; flex-direction: column; gap: 6px; }
+.row {
+  font-size: 12px; padding: 6px 8px; border-radius: 6px;
+  background: rgba(20, 50, 79, 0.6); cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.row:hover { background: rgba(47, 127, 209, 0.35); }
+.tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; color: #04121e; font-weight: 600; }
+.tag.inspection { background: #36c5f0; }
+.tag.charging { background: #f5a623; }
+.tag.noGo { background: #ff6b6b; }
+.meta { color: #88a0b5; margin-left: auto; font-size: 11px; }
+#taskTable { width: 100%; border-collapse: collapse; font-size: 12px; }
+#taskTable th, #taskTable td { text-align: left; padding: 5px 6px; border-bottom: 1px solid rgba(133, 183, 235, 0.15); }
+#taskTable th { color: #88a0b5; font-weight: 500; }
+.hint { font-size: 11px; color: #88a0b5; line-height: 1.5; }
+
+/* 实时连接指示 */
+#conn {
+  position: absolute; bottom: 14px; right: 14px; z-index: 10;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(12, 28, 44, 0.85); border: 1px solid rgba(133, 183, 235, 0.25);
+  border-radius: 8px; padding: 6px 10px; font-size: 12px; color: #c7d4e0;
+}
+#conn .dot { width: 9px; height: 9px; border-radius: 50%; background: #6e2020; }
+#conn .dot.on { background: #4fd99a; box-shadow: 0 0 8px #4fd99a; }
+
+/* 左侧场景加载面板 */
+#scenePanel {
+  position: absolute; top: 120px; left: 12px; z-index: 10;
+  width: 280px; max-height: calc(100% - 150px); overflow: auto;
+  background: rgba(12, 28, 44, 0.88);
+  border: 1px solid rgba(133, 183, 235, 0.25);
+  border-radius: 12px; padding: 14px;
+}
+#scenePanel .btn {
+  font-size: 13px; color: #e6edf3; cursor: pointer; width: 100%;
+  background: #14324f; border: 1px solid rgba(133, 183, 235, 0.3);
+  border-radius: 8px; padding: 8px 10px; transition: .15s;
+}
+#scenePanel .btn:hover { background: #1c4a73; }
+#scenePanel .btn.block { margin-bottom: 10px; }
+#scenePanel .btn.sm { width: auto; padding: 7px 12px; white-space: nowrap; }
+#scenePanel .field { display: flex; gap: 6px; margin-bottom: 8px; }
+#scenePanel .field input {
+  flex: 1; min-width: 0; font-size: 12px; color: #e6edf3;
+  background: rgba(8, 18, 30, 0.7); border: 1px solid rgba(133, 183, 235, 0.25);
+  border-radius: 7px; padding: 7px 9px;
+}
+#scenePanel .field input::placeholder { color: #6f8aa3; }
+#scenePanel .tag.scene { background: #8e7bef; }
+#scenePanel .row.muted { cursor: default; color: #88a0b5; }
+#scenePanel .rm { margin-left: auto; color: #d97474; font-weight: 700; }
+
+/* 任务编排画布 */
+#orch {
+  position: absolute; inset: 0; z-index: 20;
+  background: #0b1622; display: flex; flex-direction: column;
+}
+.orch-head {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; background: rgba(12, 28, 44, 0.92);
+  border-bottom: 1px solid rgba(133, 183, 235, 0.2);
+}
+.orch-title { font-size: 14px; font-weight: 600; color: #b5d4f4; margin-right: auto; }
+.orch-body { display: flex; flex: 1; min-height: 0; }
+.orch-side {
+  width: 240px; flex-shrink: 0; overflow: auto;
+  background: rgba(12, 28, 44, 0.85);
+  border-right: 1px solid rgba(133, 183, 235, 0.15);
+  padding: 12px;
+}
+.orch-body > .orch-side:last-child { border-right: none; border-left: 1px solid rgba(133, 183, 235, 0.15); }
+.orch-canvas { flex: 1; min-width: 0; height: 100%; }
+.rfn {
+  min-width: 110px; padding: 8px 12px; border-radius: 8px;
+  background: #14324f; border: 2px solid #36c5f0; color: #e6edf3;
+  text-align: center; font-size: 13px;
+}
+.rfn-kind { font-size: 11px; font-weight: 600; color: #04121e; border-radius: 4px; padding: 1px 6px; display: inline-block; margin-bottom: 4px; }
+.rfn-label { font-weight: 500; }
+.seq-no {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  background: #2f7fd1; color: #fff; font-size: 11px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* ===== 任务计划表（甘特排程） ===== */
+#sched {
+  position: absolute; inset: 0; z-index: 20;
+  background: #0b1622; display: flex; flex-direction: column;
+}
+.sched-head {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; background: rgba(12, 28, 44, 0.92);
+  border-bottom: 1px solid rgba(133, 183, 235, 0.2);
+}
+.sched-title { font-size: 14px; font-weight: 600; color: #b5d4f4; margin-right: auto; }
+.sched-robot { font-size: 13px; color: #88a0b5; margin-left: 8px; }
+.sched-body { flex: 1; min-height: 0; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 18px; }
+.gantt { display: flex; flex-direction: column; }
+.gantt-axis { display: flex; align-items: flex-end; }
+.gantt-axis-label {
+  width: 130px; flex-shrink: 0; font-size: 12px; color: #88a0b5;
+  padding-bottom: 4px; text-align: right; padding-right: 10px;
+}
+.gantt-axis-track { position: relative; flex: 1; height: 22px; border-bottom: 1px solid rgba(133, 183, 235, 0.25); }
+.gantt-axis-track .tick { position: absolute; top: 2px; font-size: 11px; color: #88a0b5; transform: translateX(-50%); }
+.gantt-row { display: flex; align-items: center; }
+.gantt-row-label {
+  width: 130px; flex-shrink: 0; font-size: 13px; color: #cfe3f5;
+  text-align: right; padding-right: 10px;
+}
+.gantt-row-track {
+  position: relative; flex: 1; height: 38px;
+  border-bottom: 1px solid rgba(133, 183, 235, 0.08);
+}
+.gantt-row-track .grid { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(133, 183, 235, 0.08); }
+.gantt-row-track .bar {
+  position: absolute; top: 7px; height: 24px; border-radius: 5px;
+  display: flex; align-items: center; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.gantt-row-track .bar.move { background: rgba(107, 119, 133, 0.5) !important; top: 14px; height: 10px; }
+.gantt-row-track .bar-label { font-size: 11px; color: #04121e; font-weight: 600; padding: 0 6px; white-space: nowrap; }
+.sched-table { background: rgba(12, 28, 44, 0.6); border-radius: 8px; padding: 12px; }
+.sched-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sched-table th, .sched-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid rgba(133, 183, 235, 0.12); }
+.sched-table th { color: #88a0b5; font-weight: 600; }
+.sched-table td { color: #dbe7f2; }
+.sched-table .muted { color: #88a0b5; }
+

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- vite-plugin-cesium 在 dev 模式不会注入 CESIUM_BASE_URL，而 Cesium 的
+         Worker/Assets 加载依赖该全局变量，缺失会导致 Viewer 构造失败、整页白屏。 -->
+    <script>window.CESIUM_BASE_URL = '/cesium/';</script>
+    <title>巡检调度系统 · MVP (React + Resium)</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
