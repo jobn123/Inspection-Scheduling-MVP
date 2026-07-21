@@ -58,6 +58,11 @@ function buildAmapProviders(kind: 'amapVec' | 'amapSat'): Cesium.UrlTemplateImag
   });
   return [vec];
 }
+
+// Cesium Ion token（OSM Buildings 需要从 Ion 拉取 3D Tiles）。来自构建期环境变量 VITE_CESIUM_ION_TOKEN，
+// 不写死在源码里（仓库为公开，避免泄露 token）。缺失时 OSM Buildings 加载会报错并被捕获。
+const ION_TOKEN = (import.meta.env as any).VITE_CESIUM_ION_TOKEN as string | undefined;
+if (ION_TOKEN) Cesium.Ion.defaultAccessToken = ION_TOKEN;
 // 示例园区的包围球（用于精确框定相机）：取园区四角地面 + 最高楼宇顶部
 function sampleSphere(): Cesium.BoundingSphere {
   const ground: Cesium.Cartesian3[] = [
@@ -288,9 +293,11 @@ export default function MapView() {
   const setFlyTo = useStore((s) => s.setFlyTo);
   const scenes = useStore((s) => s.scenes);
   const baseMap = useStore((s) => s.baseMap);
+  const osmBuildings = useStore((s) => s.osmBuildings);
   const finishNoGo = useStore((s) => s.finishNoGo);
   const setFinishNoGo = useStore((s) => s.setFinishNoGo);
   const baseLayersRef = useRef<Cesium.ImageryLayer[]>([]);
+  const osmRef = useRef<Cesium.Cesium3DTileset | null>(null);
 
   // 提交禁区：把当前顶点落成一个多边形（≥3 点才有效），并退出 noGo 模式
   const commitNoGo = () => {
@@ -513,6 +520,28 @@ export default function MapView() {
     flyToSample(viewer);
     setLocateSample(false);
   }, [locateSample, setLocateSample]);
+
+  // OSM Buildings（Cesium Ion 全球 3D 建筑）：按需加载 / 卸载
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer || !ION_TOKEN) return;
+    let cancelled = false;
+    if (osmBuildings) {
+      if (!osmRef.current) {
+        Cesium.createOsmBuildingsAsync()
+          .then((b) => {
+            if (cancelled || !viewerRef.current) return;
+            viewerRef.current.scene.primitives.add(b);
+            osmRef.current = b;
+          })
+          .catch((e) => console.error('OSM Buildings 加载失败（请检查 Ion token / 网络）:', e));
+      }
+    } else if (osmRef.current) {
+      viewer.scene.primitives.remove(osmRef.current);
+      osmRef.current = null;
+    }
+    return () => { cancelled = true; };
+  }, [osmBuildings]);
 
   // 点击别的按钮切走禁区模式时：若有 ≥3 个未提交顶点，自动落成一个禁区
   //（避免"画好之后点别的按钮，图就消失"）；不足 3 点则视为取消，清空预览

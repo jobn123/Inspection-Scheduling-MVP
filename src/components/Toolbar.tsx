@@ -17,6 +17,8 @@ export default function Toolbar() {
   const baseMap = useStore((s) => s.baseMap);
   const setBaseMap = useStore((s) => s.setBaseMap);
   const setFinishNoGo = useStore((s) => s.setFinishNoGo);
+  const osmBuildings = useStore((s) => s.osmBuildings);
+  const setOsmBuildings = useStore((s) => s.setOsmBuildings);
 
   return (
     <div id="toolbar">
@@ -36,6 +38,10 @@ export default function Toolbar() {
       </button>
       <button className="tool danger" onClick={clearAll}>
         清除全部
+      </button>
+      <span className="tb-sep" />
+      <button className={'tool' + (osmBuildings ? ' active' : '')} onClick={() => setOsmBuildings(!osmBuildings)} title="加载 Cesium OSM Buildings 全球 3D 建筑（需 Ion token）">
+        3D 建筑
       </button>
       <span className="tb-sep" />
       <span className="tb-sub">底图</span>

@@ -49,6 +49,7 @@ interface StoreState {
   scenes: SceneItem[];
   view: ViewMode;
   baseMap: BaseMap;
+  osmBuildings: boolean;
   flowNodes: Node<FlowNodeData>[];
   flowEdges: Edge[];
   robotCount: number;
@@ -66,6 +67,7 @@ interface StoreState {
   addScene: (s: Omit<SceneItem, 'id'>) => void;
   removeScene: (id: string) => void;
   setView: (v: ViewMode) => void;
+  setOsmBuildings: (b: boolean) => void;
   setRobotCount: (n: number) => void;
   addFlowNode: (n: Node<FlowNodeData>) => void;
   setFlow: (nodes: Node<FlowNodeData>[], edges: Edge[]) => void;
@@ -87,6 +89,7 @@ export const useStore = create<StoreState>((set) => ({
   scenes: [],
   view: 'map',
   baseMap: 'amapSat',
+  osmBuildings: false,
   flowNodes: [
     { id: 'start', type: 'flowNode', position: { x: 80, y: 140 }, data: { label: '出库起点', kind: 'start' } },
   ],
@@ -124,6 +127,8 @@ export const useStore = create<StoreState>((set) => ({
   removeScene: (id) => set((st) => ({ scenes: st.scenes.filter((x) => x.id !== id) })),
 
   setView: (v) => set({ view: v }),
+
+  setOsmBuildings: (b) => set({ osmBuildings: b }),
 
   setBaseMap: (b) => set({ baseMap: b }),
 

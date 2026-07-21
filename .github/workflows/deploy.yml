@@ -26,6 +26,8 @@ jobs:
         run: npm ci
 
       - name: Build (base 已写入 npm script)
+        env:
+          VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
         run: npm run build
 
       - name: Deploy to gh-pages
